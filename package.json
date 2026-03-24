@@ -1,0 +1,28 @@
+{
+  "name": "wps-sentinel",
+  "version": "1.0.0",
+  "description": "Real-time maritime domain awareness platform for the West Philippine Sea",
+  "scripts": {
+    "dev": "vite",
+    "start": "npx serve .",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.21",
+    "@types/leaflet.markercluster": "^1.5.6",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "terser": "^5.46.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.2"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "zustand": "^5.0.12"
+  }
+}

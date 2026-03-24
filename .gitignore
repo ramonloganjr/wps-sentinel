@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables — never commit these
+.env
+.env.local
+.env.*.local
+
+# Kiro / KiroDev artifacts
+.kiro/
+.kirodev/
+*.kiro
+*.kirodev
+
+# VS Code (optional — remove if you want to share workspace settings)
+.vscode/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript cache
+*.tsbuildinfo

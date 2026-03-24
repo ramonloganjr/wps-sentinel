@@ -1,0 +1,26 @@
+{
+  "name": "WPS Sentinel — West Philippine Sea Monitor",
+  "short_name": "WPS Sentinel",
+  "description": "Real-time maritime domain awareness platform for the West Philippine Sea.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#070707",
+  "theme_color": "#070707",
+  "icons": [
+    {
+      "src": "/img/wps-favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/wps-og.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["navigation", "utilities"],
+  "lang": "en-PH"
+}
