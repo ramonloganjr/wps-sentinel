@@ -110,8 +110,8 @@ export const MapView: React.FC = () => {
     const alert = isIncursion(vessel);
     const inWPS = vessel.inWPS;
 
-    // Consistent 44px wide, aspect-correct height (72×27.91 ratio)
-    const w = 44;
+    // Consistent 28px wide, aspect-correct height (72×27.91 ratio)
+    const w = 28;
     const h = Math.round(w * 27.91 / 72);
 
     const opacity = (alert || inWPS) ? '1' : '0.78';

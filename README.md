@@ -37,12 +37,18 @@ WPS Sentinel streams live AIS vessel positions via WebSocket, renders them on an
 - West Philippine Sea priority monitoring zone overlay
 - 6 vessel type filters with custom SVG icons (Cargo, Tanker, Fishing, Military, Coast Guard, Unknown)
 - 5 toggleable map layers (EEZ, WPS Zone, Landmarks, Vessel Density, Incursion Alerts)
-- Incursion detection for foreign-flagged vessels near sensitive zones (Scarborough Shoal, Ayungin, Whitsun Reef, Mischief Reef)
+- Incursion detection for foreign-flagged vessels near sensitive zones:
+  - Scarborough Shoal (Bajo de Masinloc) — 15.1333N, 117.7500E
+  - Second Thomas Shoal (Ayungin) — 9.7333N, 115.8667E
+  - Whitsun Reef (Julian Felipe) — 9.9700N, 114.6500E
+  - Mischief Reef (Panganiban) — 9.9167N, 115.5333E
 - Intelligence news feed — multi-proxy RSS aggregation (rss2json primary), relevance scoring, WPS prioritization, topic tabs
 - Satellite imagery toggle (Esri World Imagery)
 - Vessel detail panel with tracking and flagging actions
 - JSON data export
 - Zoom controls positioned bottom-right above Leaflet attribution
+- Header displays date (DD/MM/YYYY) alongside update time
+- Compact sidebar with tightened spacing and reduced icon sizes
 - Mobile-first responsive design — sidebar drawer on mobile/tablet, static on desktop
 - PWA install banner — cross-platform (Android, iOS, Windows, macOS, Linux; Chrome, Edge, Safari, Firefox)
 - Dark Matter theme (`#070707`) with liquid glass aesthetic (`backdrop-filter: blur + saturate`)
@@ -147,7 +153,7 @@ src/
 │   └── useTheme.ts            # Dark theme enforcement
 ├── store/
 │   └── useAppStore.ts         # Zustand global state
-├── constants/index.ts         # Coordinates, vessel types, zone polygons (no API keys)
+├── constants/index.ts         # Coordinates, vessel types, zone polygons, mock vessel definitions (no API keys)
 ├── data/
 │   ├── eezData.ts             # GeoJSON (EEZ + WPS + landmarks) inlined as TypeScript
 │   └── philippine-eez.xml     # Source: Marine Regions MRGID 8322 WFS response
@@ -167,18 +173,46 @@ public/
 ## Data Sources
 
 - **EEZ Boundary:** Marine Regions MRGID 8322 (VLIZ, Belgium) — authoritative NAMRIA RA 9522 coordinates
-- **AIS Data:** [AISStream.io](https://aisstream.io) real-time WebSocket API
+- **AIS Data (primary):** [AISStream.io](https://aisstream.io) real-time WebSocket API (confirmed live, free tier)
+- **AIS Data (fallback):** Mock data generator — 20 vessels with per-vessel fixed positions, ITU-compliant MMSI prefixes, and accurate flag/type metadata
 - **Base Map:** CartoDB Dark Matter tiles
 - **Satellite:** Esri World Imagery
 - **News:** Google News RSS via [rss2json.com](https://rss2json.com) (WPS, EEZ, Maritime, Defense, Diplomacy topics)
 
-## AIS Connection Behavior
+## AIS Data Provider Fallback Chain
 
-- Connects to `wss://stream.aisstream.io/v0/stream` on mount
-- On failure (503, network error, etc.): mock vessel data activates immediately so the UI is never empty
-- Exponential backoff reconnect: 3s → 6s → 12s → 24s → 48s (max 5 attempts)
-- Once live connection succeeds, mock data is replaced with real positions
-- After max attempts, app stays on mock data indefinitely
+WPS Sentinel uses a resilient multi-tier architecture to ensure vessel data is always available:
+
+| Priority | Provider | Type | Status | Notes |
+|---|---|---|---|---|
+| 1 | [AISStream.io](https://aisstream.io) | WebSocket (real-time) | Active | Free tier, API key required, confirmed live |
+| 2 | Mock data generator | Local simulation | Always available | 20 vessels, per-vessel positions |
+
+When AISStream fails (503, network error, invalid key), mock data activates immediately so the UI is never empty. Reconnection continues with exponential backoff (3s, 6s, 12s, 24s, 48s — max 5 attempts). When AISStream recovers, it takes over and mock data stops.
+
+### Mock Vessel Data
+
+The mock data generator produces 20 vessels with accurate metadata:
+
+- Each vessel has a fixed base position (with small random jitter per refresh)
+- PH vessels (11): positioned exclusively offshore within the Philippine EEZ — across the WPS, Sulu Sea, Sibuyan Sea, Leyte Gulf, Babuyan Channel, Verde Island Passage, Mindoro Strait, and Celebes Sea
+- CN vessels (6): positioned just outside the EEZ western perimeter along 114E-116.2E, near Scarborough Shoal and the Spratlys
+- VN vessels (2): just outside the EEZ southwestern perimeter near 113.5E
+- MY vessel (1): just outside the EEZ southern perimeter near Sabah
+- US vessel (1): transiting just outside the northern EEZ perimeter
+- MMSI prefixes follow ITU Maritime Identification Digits: PH=548, CN=412/413, VN=574, MY=533, US=338
+- Vessel names use correct naming conventions: BRP (Philippine Navy), PCG (Coast Guard), CCG (China Coast Guard), CSB (Vietnam Coast Guard), KD (Royal Malaysian Navy), MV/MT/FV (civilian)
+
+If AISStream proves permanently unreliable, remove the `VITE_AISSTREAM_API_KEY` from `.env.local` — the system will run on mock data with no errors. The architecture is designed to accept additional REST API providers (e.g. OpenAIS.org, Global Fishing Watch) as intermediate fallbacks when they become reliably available.
+
+### Evaluated Alternatives
+
+| Provider | Viability | Reason |
+|---|---|---|
+| [OpenAIS.org](https://open-ais.org) | Unstable | Free REST API with CQL filtering, but DNS/server unreliable |
+| [AISHub.net](https://www.aishub.net) | Not viable | Requires operating a physical AIS receiver station |
+| [Global Fishing Watch](https://globalfishingwatch.org) | Analytics only | Fishing effort and historical data, not real-time positions |
+| MarineTraffic / VesselFinder / Spire | Commercial | Paid APIs, not free tier suitable for this scope |
 
 ## News Feed Behavior
 

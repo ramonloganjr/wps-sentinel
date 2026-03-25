@@ -11,6 +11,10 @@ export const AIS_STALE_MS = 2 * 60_000;
 export const AISSTREAM_WS_URL = 'wss://stream.aisstream.io/v0/stream';
 export const AISSTREAM_API_KEY = import.meta.env.VITE_AISSTREAM_API_KEY ?? '';
 
+// OpenAIS.org — open-source REST API (pg_featureserv / PostGIS)
+// Currently unreliable (DNS issues). Kept as fallback option — enable when stable.
+// export const OPENAIS_API_URL = 'https://api.open-ais.org/postgisftw/collections/latest_positions/items.json';
+
 // Full Philippine EEZ bounding box — Marine Regions MRGID 8322 authoritative extent
 export const AISSTREAM_BOUNDING_BOX: [[number, number], [number, number]] = [[3.1, 113.6], [22.3, 130.0]];
 
@@ -127,14 +131,14 @@ export const WPS_ZONE_POLYGON: [number, number][] = [
 ];
 
 /**
- * Sensitive zones — coordinates verified against NAMRIA / UNCLOS reference data.
+ * Sensitive zones — coordinates verified against AMTI/CSIS, Wikidata, and UNCLOS reference data.
  * radiusNm: nautical miles (1nm = 1.852km). Haversine used for distance checks.
  */
 export const SENSITIVE_ZONES = [
-  { lat: 15.1300, lng: 117.7500, radiusNm: 12, name: 'Scarborough Shoal' },
-  { lat:  9.7300, lng: 115.8700, radiusNm: 12, name: 'Second Thomas Shoal (Ayungin)' },
-  { lat:  9.8400, lng: 118.7900, radiusNm: 12, name: 'Whitsun Reef (Julian Felipe)' },
-  { lat:  9.9000, lng: 115.5300, radiusNm: 12, name: 'Mischief Reef (Panganiban)' },
+  { lat: 15.1333, lng: 117.7500, radiusNm: 12, name: 'Scarborough Shoal (Bajo de Masinloc)' },
+  { lat:  9.7333, lng: 115.8667, radiusNm: 12, name: 'Second Thomas Shoal (Ayungin)' },
+  { lat:  9.9700, lng: 114.6500, radiusNm: 12, name: 'Whitsun Reef (Julian Felipe)' },
+  { lat:  9.9167, lng: 115.5333, radiusNm: 12, name: 'Mischief Reef (Panganiban)' },
 ];
 
 export const VESSEL_TYPES: Record<VesselType, VesselTypeConfig> = {
@@ -146,15 +150,55 @@ export const VESSEL_TYPES: Record<VesselType, VesselTypeConfig> = {
   unknown:    { color: '#8888aa', label: 'Unknown',     iconPath: '/img/ship/unkown.svg' },
 };
 
-export const MOCK_VESSEL_NAMES = [
-  // WPS area
-  'MV Kalayaan', 'BRP Gregorio del Pilar', 'Hai Yang 001',
-  'CCG 5204', 'Hai Jing 3901', 'FV Bantay Dagat',
-  // Eastern EEZ
-  'MV Pacific Trader', 'MV Romblon Star', 'MV Visayas',
-  'FV Luzon Fisher', 'MV Mindanao', 'MV Palawan Express',
-  // Benham Rise / North
-  'CSCL Globe', 'MV Cebu Star', 'BRP Andres Bonifacio',
-  'MV Batanes Star', 'FV Eastern Fisher', 'MV Sulu Trader',
-  'PCG Gabriela Silang', 'MV Leyte Gulf',
+/**
+ * Mock vessel definitions — each entry has a name, flag (ISO 3166-1 alpha-2),
+ * vessel type, and MMSI prefix per ITU Maritime Identification Digits (MID).
+ *
+ * MID codes: PH=548, CN=412, VN=574, MY=533, US=338
+ * MMSI format: MIDxxxxxx (9 digits total)
+ *
+ * PH vessels: positioned inside the Philippine EEZ
+ * Foreign vessels: positioned just outside the EEZ perimeter, hugging the boundary
+ */
+export const MOCK_VESSELS: Array<{
+  name: string; flag: string; type: VesselType; mmsiPrefix: string;
+  position: [number, number];
+}> = [
+  // ── Philippine Navy / Coast Guard (inside EEZ, offshore) ──
+  // BRP del Pilar: WPS patrol near Scarborough Shoal
+  { name: 'BRP Gregorio del Pilar',  flag: 'PH', type: 'military',   mmsiPrefix: '548', position: [15.20, 117.80] },
+  // BRP Bonifacio: patrolling Verde Island Passage (between Luzon and Mindoro)
+  { name: 'BRP Andres Bonifacio',    flag: 'PH', type: 'military',   mmsiPrefix: '548', position: [13.60, 120.60] },
+  // PCG Silang: Sulu Sea patrol west of Palawan
+  { name: 'PCG Gabriela Silang',     flag: 'PH', type: 'coastguard', mmsiPrefix: '548', position: [ 9.80, 118.20] },
+  // BRP Cabra: Mindoro Strait patrol
+  { name: 'BRP Cabra',               flag: 'PH', type: 'coastguard', mmsiPrefix: '548', position: [12.80, 119.80] },
+  // ── Philippine civilian (inside EEZ, offshore shipping lanes) ──
+  // MV Kalayaan: Manila-bound cargo, South China Sea approach
+  { name: 'MV Kalayaan',             flag: 'PH', type: 'cargo',      mmsiPrefix: '548', position: [14.20, 119.40] },
+  // MV Palawan Express: Sulu Sea route between Palawan and Visayas
+  { name: 'MV Palawan Express',      flag: 'PH', type: 'cargo',      mmsiPrefix: '548', position: [10.40, 119.20] },
+  // FV Bantay Dagat: fishing grounds off Zambales coast (WPS side)
+  { name: 'FV Bantay Dagat',         flag: 'PH', type: 'fishing',    mmsiPrefix: '548', position: [15.50, 119.20] },
+  // FV Luzon Fisher: Babuyan Channel fishing grounds north of Luzon
+  { name: 'FV Luzon Fisher',         flag: 'PH', type: 'fishing',    mmsiPrefix: '548', position: [19.00, 121.50] },
+  // MV Cebu Star: Leyte Gulf shipping lane
+  { name: 'MV Cebu Star',            flag: 'PH', type: 'cargo',      mmsiPrefix: '548', position: [10.80, 125.20] },
+  // MV Romblon Star: Sibuyan Sea inter-island route
+  { name: 'MV Romblon Star',         flag: 'PH', type: 'cargo',      mmsiPrefix: '548', position: [12.40, 122.80] },
+  // ── Chinese vessels — just outside EEZ western perimeter ──
+  { name: 'CCG 5204',                flag: 'CN', type: 'coastguard', mmsiPrefix: '412', position: [15.10, 116.10] },
+  { name: 'Hai Jing 3901',           flag: 'CN', type: 'coastguard', mmsiPrefix: '412', position: [13.90, 116.00] },
+  { name: 'Hai Yang 001',            flag: 'CN', type: 'fishing',    mmsiPrefix: '412', position: [10.00, 114.00] },
+  { name: 'Lu Peng Yuan Yu 028',     flag: 'CN', type: 'fishing',    mmsiPrefix: '412', position: [11.50, 114.80] },
+  // ── Vietnamese vessels — just outside EEZ southwestern perimeter ──
+  { name: 'CSB 8003',                flag: 'VN', type: 'coastguard', mmsiPrefix: '574', position: [ 8.80, 113.50] },
+  { name: 'FV Binh Thuan 01',        flag: 'VN', type: 'fishing',    mmsiPrefix: '574', position: [ 9.30, 113.60] },
+  // ── Malaysian vessel — just outside EEZ southern perimeter near Sabah ──
+  { name: 'KD Keris',                flag: 'MY', type: 'military',   mmsiPrefix: '533', position: [ 5.80, 118.20] },
+  // ── International cargo — transiting just outside EEZ ──
+  { name: 'CSCL Globe',              flag: 'CN', type: 'cargo',      mmsiPrefix: '413', position: [17.50, 116.20] },
+  { name: 'MV Pacific Trader',       flag: 'US', type: 'cargo',      mmsiPrefix: '338', position: [19.00, 117.80] },
+  // ── Philippine tanker (inside EEZ, Celebes Sea off southeast Mindanao) ──
+  { name: 'MT Mindanao Spirit',      flag: 'PH', type: 'tanker',     mmsiPrefix: '548', position: [ 5.80, 126.50] },
 ];

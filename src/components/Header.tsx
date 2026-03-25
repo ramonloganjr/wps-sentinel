@@ -46,7 +46,7 @@ export const Header: React.FC<Props> = ({ onMenuToggle, sidebarOpen, installable
           <span>{vesselCount}</span><span className="hdr-vessels-lbl"> vessels</span>
         </div>
         <div className="last-update hdr-hide-xs">
-          Updated: <span>{lastUpdate ? lastUpdate.toLocaleTimeString() : '—'}</span>
+          Updated: <span>{lastUpdate ? `${lastUpdate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} ${lastUpdate.toLocaleTimeString()}` : '—'}</span>
         </div>
         {installable && onInstall && (
           <button type="button" className="install-btn" onClick={onInstall} aria-label="Install app">
