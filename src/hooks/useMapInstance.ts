@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import L from 'leaflet';
+// Exposes Leaflet as window.L *before* the markercluster plugin evaluates.
+import L from '../leaflet-global';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
