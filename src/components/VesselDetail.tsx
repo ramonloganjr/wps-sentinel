@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { VESSEL_TYPES } from '../constants';
 import { normalizeFlag } from '../utils/ais';
@@ -9,6 +9,22 @@ interface Props {
 
 export const VesselDetail: React.FC<Props> = ({ onTrack }) => {
   const { selectedVessel, setSelectedVessel, setTrackedMMSI, addAlert } = useAppStore();
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Move focus into the panel on open, close on Escape, restore focus on close.
+  useEffect(() => {
+    if (!selectedVessel) return;
+    const prevActive = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setSelectedVessel(null); setTrackedMMSI(null); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      prevActive?.focus?.();
+    };
+  }, [selectedVessel, setSelectedVessel, setTrackedMMSI]);
 
   if (!selectedVessel) return null;
 
@@ -31,8 +47,8 @@ export const VesselDetail: React.FC<Props> = ({ onTrack }) => {
   };
 
   return (
-    <div className="vessel-detail glass-panel" role="dialog" aria-label={`Vessel details for ${v.name}`}>
-      <button type="button" className="close-btn" onClick={handleClose} aria-label="Close vessel detail">
+    <div className="vessel-detail glass-panel" role="dialog" aria-modal="true" aria-label={`Vessel details for ${v.name}`}>
+      <button ref={closeRef} type="button" className="close-btn" onClick={handleClose} aria-label="Close vessel detail">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M6 6l12 12" /><path d="M18 6L6 18" />
         </svg>

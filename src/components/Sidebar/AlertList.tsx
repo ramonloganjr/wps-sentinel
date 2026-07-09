@@ -20,14 +20,19 @@ export const AlertList: React.FC<Props> = ({ onAlertClick }) => {
         {alerts.length === 0 ? (
           <p className="sb-empty">No active alerts</p>
         ) : (
-          alerts.map((a, i) => (
+          alerts.map((a) => (
             <div
-              key={i}
+              key={`${a.mmsi ?? 'na'}-${a.type}-${a.time.getTime()}`}
               className={`sb-alert sb-alert--${a.type === 'INCURSION' ? 'danger' : 'warn'}`}
               onClick={() => a.mmsi && onAlertClick(a.mmsi)}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && a.mmsi && onAlertClick(a.mmsi)}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && a.mmsi) {
+                  e.preventDefault();
+                  onAlertClick(a.mmsi);
+                }
+              }}
             >
               <div className="sb-alert-type">{a.type}</div>
               <div className="sb-alert-msg">{a.message}</div>
