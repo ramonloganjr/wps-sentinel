@@ -129,6 +129,14 @@ public_html/
 
 The included `.htaccess` handles HTTPS redirect, SPA fallback, gzip compression, 1-year cache for hashed assets, and security headers.
 
+### Deploy to Vercel
+
+1. Import the repository into Vercel — the Vite preset is auto-detected (build `npm run build`, output `dist/`).
+2. Add the environment variable **`VITE_AISSTREAM_API_KEY`** in *Project → Settings → Environment Variables* (Production + Preview). Trigger a redeploy so it is inlined into the build.
+3. `vercel.json` provides the security headers (CSP, HSTS, Permissions-Policy), hashed-asset caching, and SPA fallback — the Vercel equivalent of the `.htaccess` used for cPanel.
+
+> **Note:** `VITE_*` variables are embedded in the client bundle at build time. The AISStream key is therefore visible to anyone who inspects the deployed JavaScript. Use a free-tier key scoped to this purpose and rotate it if it is ever exposed. AISStream streams over a browser WebSocket, so a server-side proxy is not practical on Vercel's serverless model.
+
 ### Preview Production Build
 
 ```bash
