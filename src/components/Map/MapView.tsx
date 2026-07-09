@@ -36,7 +36,7 @@ export const MapView: React.FC = () => {
     const map = mapRef.current;
     const eez = geoLayers.eez;
     if (!map || !eez) return;
-    layers.eez ? eez.addTo(map) : map.removeLayer(eez);
+    if (layers.eez) eez.addTo(map); else map.removeLayer(eez);
   }, [layers.eez, mapRef, geoLayers.eez]);
 
   // ── WPS zone layer toggle ─────────────────────────────────────────────────
@@ -44,7 +44,7 @@ export const MapView: React.FC = () => {
     const map = mapRef.current;
     const wps = geoLayers.wpsZone;
     if (!map || !wps) return;
-    layers.wpsZone ? wps.addTo(map) : map.removeLayer(wps);
+    if (layers.wpsZone) wps.addTo(map); else map.removeLayer(wps);
   }, [layers.wpsZone, mapRef, geoLayers.wpsZone]);
 
   // ── Landmark layer toggle ─────────────────────────────────────────────────
@@ -52,7 +52,7 @@ export const MapView: React.FC = () => {
     const map = mapRef.current;
     const lm = geoLayers.landmarks;
     if (!map || !lm) return;
-    layers.landmarks ? lm.addTo(map) : map.removeLayer(lm);
+    if (layers.landmarks) lm.addTo(map); else map.removeLayer(lm);
   }, [layers.landmarks, mapRef, geoLayers.landmarks]);
 
   // ── Incursion alerts layer toggle ─────────────────────────────────────────
@@ -60,7 +60,7 @@ export const MapView: React.FC = () => {
     const map = mapRef.current;
     const inc = geoLayers.incursions;
     if (!map || !inc) return;
-    layers.incursions ? inc.addTo(map) : map.removeLayer(inc);
+    if (layers.incursions) inc.addTo(map); else map.removeLayer(inc);
   }, [layers.incursions, mapRef, geoLayers.incursions]);
 
   // ── Heatmap layer toggle ──────────────────────────────────────────────────
@@ -68,7 +68,7 @@ export const MapView: React.FC = () => {
     const map = mapRef.current;
     const hm = geoLayers.heatmap;
     if (!map || !hm) return;
-    layers.heatmap ? hm.addTo(map) : map.removeLayer(hm);
+    if (layers.heatmap) hm.addTo(map); else map.removeLayer(hm);
   }, [layers.heatmap, mapRef, geoLayers.heatmap]);
 
   // ── Populate incursion markers layer ─────────────────────────────────────

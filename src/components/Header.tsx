@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useAppStore } from '../store/useAppStore';
 import type { ConnectionStatus } from '../types';
 
