@@ -41,22 +41,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <script>
-    const savedTheme = localStorage.getItem('theme');
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (systemDark ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-theme', theme);
-  </script>
+  <script src="/theme-init.js"></script>
 </head>
 <body>
   <div id="root"></div>
   <script type="module" src="src/main.tsx"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
-      });
-    }
-  </script>
+  <script src="/sw-register.js"></script>
 </body>
 </html>

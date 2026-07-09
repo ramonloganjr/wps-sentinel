@@ -28,6 +28,20 @@
   Header always set X-Content-Type-Options "nosniff"
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # HTTP Strict Transport Security — 1 year, subdomains, preload-eligible.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # Disable browser features the app never uses.
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=(), interest-cohort=()"
+
+  # Content Security Policy. Allowlists exactly what the app talks to:
+  #   scripts: self only (inline scripts externalised to /theme-init.js & /sw-register.js)
+  #   styles/fonts: Google Fonts (Barlow); 'unsafe-inline' required by Leaflet + inline style attrs
+  #   images: self + data URIs + CARTO/Esri map tiles
+  #   connect: AISStream WebSocket + RSS-to-JSON proxies
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.basemaps.cartocdn.com https://server.arcgisonline.com; connect-src 'self' wss://stream.aisstream.io https://api.rss2json.com https://api.allorigins.win https://corsproxy.io; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests"
+
   <FilesMatch "\.(js|css)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
