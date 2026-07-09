@@ -271,11 +271,11 @@ html, body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 8.5px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.4px;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.55);
   margin-bottom: 6px;
 }
 
@@ -363,9 +363,9 @@ html, body {
   min-width: 0;
 }
 .sb-desc {
-  font-size: 9px;
-  color: rgba(255,255,255,0.3);
-  line-height: 1.2;
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.25;
 }
 
 /* ── Stats ── */
@@ -397,11 +397,11 @@ html, body {
 
 .sb-stat-lbl {
   display: block;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.5);
   margin-top: 4px;
 }
 
@@ -439,7 +439,7 @@ html, body {
 }
 
 .sb-alert-type {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -448,8 +448,8 @@ html, body {
 }
 .sb-alert--warn .sb-alert-type { color: #f59e0b; }
 
-.sb-alert-msg  { font-size: 11px; color: var(--text); line-height: 1.4; }
-.sb-alert-time { font-size: 9.5px; color: rgba(255,255,255,0.3); margin-top: 3px; }
+.sb-alert-msg  { font-size: 11.5px; color: var(--text); line-height: 1.4; }
+.sb-alert-time { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 3px; }
 
 /* ── Legacy aliases (kept for any remaining refs) ── */
 .sidebar-section { border-radius: 8px; padding: 12px; margin-bottom: 6px; }
@@ -711,15 +711,16 @@ html, body {
 .leaflet-popup-tip { background: rgba(7,7,7,0.95); }
 .leaflet-popup-content { font-family: var(--font); font-size: 12px; margin: 10px 14px; }
 
-/* Attribution — black text, z-index below sidebar (910) */
+/* Attribution — light text on translucent dark chip to read on the dark basemap */
 .leaflet-control-attribution {
-  color: #000 !important;
+  color: rgba(255,255,255,0.6) !important;
+  background: rgba(7,7,7,0.7) !important;
   font-family: var(--font) !important;
-  font-size: 9px !important;
+  font-size: 10px !important;
   z-index: 400 !important;
   position: relative;
 }
-.leaflet-control-attribution a { color: #000 !important; }
+.leaflet-control-attribution a { color: rgba(255,255,255,0.85) !important; }
 
 /* Zoom controls — bottom-right, styled to match app */
 .leaflet-control-zoom {
@@ -838,16 +839,16 @@ html, body {
 .nf-dot--spin { background: var(--accent); animation: spin 1s linear infinite; }
 
 .nf-title {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.4px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.62);
   margin: 0;
 }
 
 .nf-status {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -858,8 +859,8 @@ html, body {
 .nf-status--warn { color: var(--warning); background: rgba(255,170,0,0.08);  border: 1px solid rgba(255,170,0,0.2); }
 
 .nf-updated {
-  font-size: 10px;
-  color: rgba(255,255,255,0.25);
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.55);
   font-variant-numeric: tabular-nums;
 }
 
@@ -904,9 +905,9 @@ html, body {
   gap: 5px;
   padding: 0 12px;
   height: 34px;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 600;
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.55);
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
@@ -916,7 +917,7 @@ html, body {
   flex-shrink: 0;
   margin-bottom: -1px;
 }
-.nf-tab:hover { color: rgba(255,255,255,0.6); }
+.nf-tab:hover { color: rgba(255,255,255,0.85); }
 .nf-tab--active {
   color: var(--text);
   border-bottom-color: var(--accent);
@@ -925,10 +926,10 @@ html, body {
 .nf-tab--wps.nf-tab--active { color: #38bdf8; border-bottom-color: #38bdf8; }
 
 .nf-tab-n {
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
-  color: rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.08);
   border-radius: 999px;
   padding: 0 5px;
   min-width: 16px;
@@ -964,14 +965,14 @@ html, body {
 .ni-idx {
   font-size: 10px;
   font-weight: 600;
-  color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.42);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
 
 /* Topic tag */
 .ni-tag {
-  font-size: 8.5px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -1003,9 +1004,9 @@ html, body {
 
 /* Source */
 .ni-source {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 500;
-  color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.5);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1015,8 +1016,8 @@ html, body {
 
 /* Time */
 .ni-time {
-  font-size: 10px;
-  color: rgba(255,255,255,0.2);
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.5);
   text-align: right;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -1061,8 +1062,8 @@ html, body {
 }
 
 .nf-count {
-  font-size: 10px;
-  color: rgba(255,255,255,0.2);
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.5);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1093,12 +1094,12 @@ html, body {
 }
 @media (max-width: 600px) {
   .nf-bar { height: 38px; }
-  .nf-title { font-size: 9px; }
+  .nf-title { font-size: 10px; }
   .ni { grid-template-columns: 20px 1fr 32px; height: 40px; padding: 0 12px; }
   .ni-tag { display: none; }
-  .ni-idx { font-size: 9px; }
-  .ni-title { padding: 0 8px; font-size: 11px; }
-  .ni-time { font-size: 9px; }
+  .ni-idx { font-size: 10px; }
+  .ni-title { padding: 0 8px; font-size: 11.5px; }
+  .ni-time { font-size: 10px; }
 }
 
 
@@ -1231,4 +1232,21 @@ html, body {
 @media (min-width: 1024px) {
   .install-banner { padding: 14px 32px; }
   .install-banner-sub { max-width: 600px; white-space: normal; }
+}
+
+/* ── Reduced motion — honor user preference for less animation ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Visible keyboard focus for interactive controls ── */
+:where(button, a, input, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
