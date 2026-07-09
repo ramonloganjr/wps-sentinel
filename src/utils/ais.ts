@@ -1,9 +1,77 @@
 import { SENSITIVE_ZONES, WPS_ZONE_POLYGON, AISSTREAM_BOUNDING_BOX } from '../constants';
-import type { Vessel } from '../types';
+import type { Vessel, VesselType } from '../types';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const DEG_TO_RAD = Math.PI / 180;
 const EARTH_RADIUS_NM = 3440.065; // nautical miles
+
+// ── MMSI → flag (ITU Maritime Identification Digits) ─────────────────────────
+/**
+ * Maps the first three MMSI digits (MID) to an ISO 3166-1 alpha-2 flag.
+ * Covers the South China Sea / Indo-Pacific region plus major maritime and
+ * flag-of-convenience states — i.e. every flag realistically seen in the
+ * Philippine EEZ bounding box. Unmapped prefixes fall back to 'XX'.
+ * Source: ITU Table of Maritime Identification Digits.
+ */
+const MID_TO_ISO: Record<string, string> = {
+  // ── South China Sea / Southeast Asia ──
+  '548': 'PH',
+  '412': 'CN', '413': 'CN', '414': 'CN', '477': 'HK', '453': 'MO', '416': 'TW',
+  '574': 'VN', '533': 'MY', '525': 'ID', '567': 'TH', '508': 'BN',
+  '514': 'KH', '515': 'KH', '506': 'MM',
+  '563': 'SG', '564': 'SG', '565': 'SG', '566': 'SG',
+  // ── East Asia ──
+  '431': 'JP', '432': 'JP', '440': 'KR', '441': 'KR', '445': 'KP',
+  // ── South Asia ──
+  '419': 'IN', '405': 'BD', '417': 'LK', '463': 'PK',
+  // ── Oceania ──
+  '503': 'AU', '512': 'NZ', '540': 'NC', '553': 'PG',
+  // ── Americas ──
+  '338': 'US', '366': 'US', '367': 'US', '368': 'US', '369': 'US', '358': 'US', '359': 'US',
+  '316': 'CA', '710': 'BR',
+  // ── Europe ──
+  '273': 'RU', '271': 'TR',
+  '232': 'GB', '233': 'GB', '234': 'GB', '235': 'GB',
+  '226': 'FR', '227': 'FR', '228': 'FR',
+  '211': 'DE', '218': 'DE',
+  '244': 'NL', '245': 'NL', '246': 'NL',
+  '247': 'IT', '224': 'ES', '225': 'ES',
+  '237': 'GR', '239': 'GR', '240': 'GR', '241': 'GR',
+  '257': 'NO', '258': 'NO', '259': 'NO', '219': 'DK', '220': 'DK',
+  // ── Middle East ──
+  '403': 'SA', '470': 'AE', '471': 'AE', '422': 'IR',
+  // ── Flags of convenience (common on cargo/tankers) ──
+  '351': 'PA', '352': 'PA', '353': 'PA', '354': 'PA', '355': 'PA', '356': 'PA',
+  '357': 'PA', '370': 'PA', '371': 'PA', '372': 'PA', '373': 'PA', '374': 'PA',
+  '636': 'LR', '637': 'LR', '538': 'MH', '215': 'MT', '229': 'MT', '248': 'MT', '249': 'MT', '256': 'MT',
+  '209': 'CY', '210': 'CY', '212': 'CY', '308': 'BS', '309': 'BS', '311': 'BS',
+};
+
+/**
+ * Derives the vessel flag (ISO alpha-2) from its MMSI.
+ * Returns 'XX' when the MID is unknown or the MMSI is malformed.
+ */
+export function midToFlag(mmsi: string): string {
+  const digits = String(mmsi).replace(/\D/g, '');
+  if (digits.length < 3) return 'XX';
+  return MID_TO_ISO[digits.slice(0, 3)] ?? 'XX';
+}
+
+// ── AIS ship-type code → app VesselType ──────────────────────────────────────
+/**
+ * Maps an AIS static ship-type code (0–99) to one of the app's vessel types.
+ * See ITU-R M.1371 Table 53. Codes with no direct app equivalent (passenger,
+ * sailing, pleasure, tugs, etc.) resolve to 'unknown'.
+ */
+export function aisTypeToVesselType(code: number | null | undefined): VesselType {
+  if (code == null || !Number.isFinite(code)) return 'unknown';
+  if (code === 30) return 'fishing';                 // Fishing
+  if (code === 35) return 'military';                // Military operations
+  if (code === 51 || code === 55) return 'coastguard'; // SAR / Law enforcement
+  if (code >= 70 && code <= 79) return 'cargo';      // Cargo
+  if (code >= 80 && code <= 89) return 'tanker';     // Tanker
+  return 'unknown';
+}
 
 // ── Haversine distance (nautical miles) ──────────────────────────────────────
 /**

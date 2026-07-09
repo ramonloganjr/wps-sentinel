@@ -4,8 +4,10 @@ import {
   AIS_STALE_MS, REFRESH_MS, MOCK_VESSELS,
 } from '../constants';
 import { useAppStore } from '../store/useAppStore';
-import type { Vessel, VesselType } from '../types';
-import { isIncursion, isInWPS, sanitizePosition } from '../utils/ais';
+import type { Vessel } from '../types';
+import {
+  isIncursion, isInWPS, sanitizePosition, midToFlag, aisTypeToVesselType,
+} from '../utils/ais';
 
 // ── Data source priority ──────────────────────────────────────────────────────
 // 1. AISStream.io  — WebSocket, real-time, requires API key (confirmed working)
@@ -19,9 +21,10 @@ import { isIncursion, isInWPS, sanitizePosition } from '../utils/ais';
 function generateMockVessels(): Vessel[] {
   return MOCK_VESSELS.map((def, i) => {
     const [baseLat, baseLng] = def.position;
-    // Small random jitter (±0.15°) so vessels don't stack exactly on the same point
-    const lat = Math.round((baseLat + (Math.random() - 0.5) * 0.3) * 1e6) / 1e6;
-    const lng = Math.round((baseLng + (Math.random() - 0.5) * 0.3) * 1e6) / 1e6;
+    // Small random jitter (±0.05°, ~3nm) so vessels drift slightly without
+    // leaving the 12nm sensitive-zone radius that drives incursion alerts.
+    const lat = Math.round((baseLat + (Math.random() - 0.5) * 0.1) * 1e6) / 1e6;
+    const lng = Math.round((baseLng + (Math.random() - 0.5) * 0.1) * 1e6) / 1e6;
     const vessel: Vessel = {
       mmsi: `${def.mmsiPrefix}${String(i).padStart(6, '0')}`,
       name: def.name,
@@ -54,6 +57,9 @@ export function useAISStream() {
   const attemptRef        = useRef(0);
   const destroyedRef      = useRef(false);
   const alertedMMSIs      = useRef<Set<string>>(new Set());
+  // Static AIS metadata (name/type) arrives in separate ShipStaticData messages,
+  // keyed by MMSI, and is merged into position reports as it becomes available.
+  const staticDataRef     = useRef<Record<string, { name?: string; type?: Vessel['type'] }>>({});
 
   const checkAndAlert = useCallback((vessel: Vessel) => {
     if (isIncursion(vessel)) {
@@ -128,7 +134,8 @@ export function useAISStream() {
       ws.send(JSON.stringify({
         APIKey: AISSTREAM_API_KEY,
         BoundingBoxes: [[AISSTREAM_BOUNDING_BOX[0], AISSTREAM_BOUNDING_BOX[1]]],
-        FilterMessageTypes: ['PositionReport'],
+        // PositionReport → coordinates/speed; ShipStaticData → name + ship type.
+        FilterMessageTypes: ['PositionReport', 'ShipStaticData'],
       }));
       setStatus('live');
     };
@@ -136,11 +143,38 @@ export function useAISStream() {
     ws.onmessage = (event) => {
       if (destroyedRef.current) return;
       try {
-        const msg = JSON.parse(event.data);
+        const msg  = JSON.parse(event.data);
+        const meta = msg?.MetaData;
+        const mmsi = meta?.MMSI;
+        if (!mmsi) return;
+        const key = String(mmsi);
+
+        // ── Static data: cache name/type, patch any live vessel already shown ──
+        const staticData = msg?.Message?.ShipStaticData;
+        if (msg?.MessageType === 'ShipStaticData' && staticData) {
+          const name = staticData?.Name?.trim();
+          const type = aisTypeToVesselType(Number(staticData?.Type));
+          staticDataRef.current[key] = {
+            name: name || staticDataRef.current[key]?.name,
+            type: type !== 'unknown' ? type : staticDataRef.current[key]?.type,
+          };
+          const existing = useAppStore.getState().vessels[key];
+          if (existing) {
+            const merged: Vessel = {
+              ...existing,
+              name: staticDataRef.current[key].name || existing.name,
+              type: staticDataRef.current[key].type ?? existing.type,
+            };
+            upsertVessel(merged);
+            checkAndAlert(merged);
+            scheduleRender();
+          }
+          return;
+        }
+
+        // ── Position report ──
         const position = msg?.Message?.PositionReport;
-        const meta     = msg?.MetaData;
-        const mmsi     = meta?.MMSI;
-        if (!mmsi || !position) return;
+        if (!position) return;
 
         const lat = position?.Latitude  ?? meta?.latitude;
         const lng = position?.Longitude ?? meta?.longitude;
@@ -149,13 +183,19 @@ export function useAISStream() {
         const pos = sanitizePosition(lat, lng);
         if (!pos) return;
 
+        const cached  = staticDataRef.current[key];
+        // AIS TrueHeading uses 511 to mean "not available"; drop it to 0.
+        const rawHdg  = Number(position?.TrueHeading);
+        const heading = rawHdg >= 0 && rawHdg < 360 ? rawHdg : 0;
+
         const vessel: Vessel = {
-          mmsi: String(mmsi),
-          name: meta?.ShipName?.trim() || `Vessel ${mmsi}`,
-          flag: 'XX', type: 'unknown',
+          mmsi: key,
+          name: cached?.name || meta?.ShipName?.trim() || `Vessel ${mmsi}`,
+          flag: midToFlag(key),
+          type: cached?.type ?? 'unknown',
           lat: pos.lat, lng: pos.lng,
           speed:   Math.min(Number(position?.Sog) || 0, 50),
-          heading: ((Number(position?.TrueHeading) || 0) + 360) % 360,
+          heading,
           status:  'Reporting',
           lastSeen:   meta?.time_utc ? new Date(meta.time_utc).toISOString() : new Date().toISOString(),
           lastSeenMs: meta?.time_utc ? new Date(meta.time_utc).getTime()     : Date.now(),

@@ -186,11 +186,15 @@ export const MOCK_VESSELS: Array<{
   { name: 'MV Cebu Star',            flag: 'PH', type: 'cargo',      mmsiPrefix: '548', position: [10.80, 125.20] },
   // MV Romblon Star: Sibuyan Sea inter-island route
   { name: 'MV Romblon Star',         flag: 'PH', type: 'cargo',      mmsiPrefix: '548', position: [12.40, 122.80] },
-  // ── Chinese vessels — just outside EEZ western perimeter ──
-  { name: 'CCG 5204',                flag: 'CN', type: 'coastguard', mmsiPrefix: '412', position: [15.10, 116.10] },
-  { name: 'Hai Jing 3901',           flag: 'CN', type: 'coastguard', mmsiPrefix: '412', position: [13.90, 116.00] },
-  { name: 'Hai Yang 001',            flag: 'CN', type: 'fishing',    mmsiPrefix: '412', position: [10.00, 114.00] },
-  { name: 'Lu Peng Yuan Yu 028',     flag: 'CN', type: 'fishing',    mmsiPrefix: '412', position: [11.50, 114.80] },
+  // ── Chinese vessels — loitering at the disputed features (triggers incursion alerts) ──
+  // CCG maintains near-constant presence at Scarborough Shoal
+  { name: 'CCG 5204',                flag: 'CN', type: 'coastguard', mmsiPrefix: '412', position: [15.1333, 117.7500] },
+  // CCG blockade activity around Second Thomas Shoal (Ayungin)
+  { name: 'Hai Jing 3901',           flag: 'CN', type: 'coastguard', mmsiPrefix: '412', position: [ 9.7333, 115.8667] },
+  // Maritime-militia swarm at Whitsun Reef (Julian Felipe)
+  { name: 'Hai Yang 001',            flag: 'CN', type: 'fishing',    mmsiPrefix: '412', position: [ 9.9700, 114.6500] },
+  // Presence at Mischief Reef (Panganiban)
+  { name: 'Lu Peng Yuan Yu 028',     flag: 'CN', type: 'fishing',    mmsiPrefix: '412', position: [ 9.9167, 115.5333] },
   // ── Vietnamese vessels — just outside EEZ southwestern perimeter ──
   { name: 'CSB 8003',                flag: 'VN', type: 'coastguard', mmsiPrefix: '574', position: [ 8.80, 113.50] },
   { name: 'FV Binh Thuan 01',        flag: 'VN', type: 'fishing',    mmsiPrefix: '574', position: [ 9.30, 113.60] },
