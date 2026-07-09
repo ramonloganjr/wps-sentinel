@@ -42,23 +42,12 @@ html, body {
   min-height: 0;
 }
 
-/* ── Scroll root: map fixed, news + footer scroll ── */
+/* ── Scroll root: stacked top-to-bottom — map/sidebar, then news, then footer ── */
 .app-scroll-root {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
-}
-
-/* Mobile: news first, map second */
-.app-body   { order: unset; }
-.app-news   { order: unset; }
-.app-footer-wrap { order: unset; }
-
-@media (min-width: 600px) {
-  .app-body   { order: unset; }
-  .app-news   { order: unset; }
-  .app-footer-wrap { order: unset; }
 }
 
 /* ── Liquid Glass Utilities ── */

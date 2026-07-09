@@ -39,6 +39,9 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) return 'vendor-react';
           if (id.includes('node_modules/zustand')) return 'vendor-zustand';
+          // Leaflet + MarkerCluster is the largest dependency — isolate it so
+          // it caches independently of app code and the other vendors.
+          if (id.includes('node_modules/leaflet')) return 'vendor-leaflet';
         },
         // Hashed filenames for cache busting
         entryFileNames:  'assets/[name]-[hash].js',

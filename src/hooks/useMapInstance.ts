@@ -106,13 +106,12 @@ export function useMapInstance(containerId: string) {
       pane: 'landmarkPane',
       pointToLayer: (feature, latlng) => {
         if (feature.properties?.type === 'exclusion') {
-          return (L as unknown as { circle: (ll: L.LatLng, o: object) => L.Circle })
-            .circle(latlng, {
-              radius: 12 * 1852,
-              color: '#f59e0b', weight: 0.75, dashArray: '4 6',
-              fillColor: '#f59e0b', fillOpacity: 0.03,
-              interactive: false, pane: 'landmarkPane',
-            });
+          return L.circle(latlng, {
+            radius: 12 * 1852,
+            color: '#f59e0b', weight: 0.75, dashArray: '4 6',
+            fillColor: '#f59e0b', fillOpacity: 0.03,
+            interactive: false, pane: 'landmarkPane',
+          });
         }
         const hi = feature.properties?.priority === 'high';
         return L.circleMarker(latlng, {
@@ -139,8 +138,7 @@ export function useMapInstance(containerId: string) {
 
     // ── Vessel cluster — added last, uses default markerPane (z=600) ─────
     // This guarantees vessels always render above every geo layer.
-    const cluster = (L as unknown as { markerClusterGroup: (opts: object) => L.MarkerClusterGroup })
-      .markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true, showCoverageOnHover: false });
+    const cluster = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true, showCoverageOnHover: false });
     cluster.addTo(map);
     clusterRef.current = cluster;
 
