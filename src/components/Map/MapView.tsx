@@ -11,7 +11,14 @@ const MAP_ID = 'wps-map';
 
 export const MapView: React.FC = () => {
   const { mapRef, tileRef, satelliteRef, clusterRef, geoLayers } = useMapInstance(MAP_ID);
-  const { vessels, filters, layers, isSatellite, toggleSatellite, setSelectedVessel, trackedMMSI, alerts } = useAppStore();
+  const vessels = useAppStore((s) => s.vessels);
+  const filters = useAppStore((s) => s.filters);
+  const layers = useAppStore((s) => s.layers);
+  const isSatellite = useAppStore((s) => s.isSatellite);
+  const toggleSatellite = useAppStore((s) => s.toggleSatellite);
+  const setSelectedVessel = useAppStore((s) => s.setSelectedVessel);
+  const trackedMMSI = useAppStore((s) => s.trackedMMSI);
+  const alerts = useAppStore((s) => s.alerts);
   const markersRef = useRef<Record<string, L.Marker>>({});
 
   // ── Satellite toggle ──────────────────────────────────────────────────────

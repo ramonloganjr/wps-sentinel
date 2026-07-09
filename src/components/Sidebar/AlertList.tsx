@@ -6,7 +6,7 @@ interface Props {
 }
 
 export const AlertList: React.FC<Props> = ({ onAlertClick }) => {
-  const { alerts } = useAppStore();
+  const alerts = useAppStore((s) => s.alerts);
 
   return (
     <section className="sb-card">

@@ -2,7 +2,8 @@ import React from 'react';
 import { useAppStore } from '../../store/useAppStore';
 
 export const StatsGrid: React.FC = () => {
-  const { vessels, alerts } = useAppStore();
+  const vessels = useAppStore((s) => s.vessels);
+  const alerts = useAppStore((s) => s.alerts);
   const list = Object.values(vessels);
 
   const stats = [

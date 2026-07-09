@@ -8,7 +8,8 @@ const FILTER_KEYS: (keyof FilterState)[] = [
 ];
 
 export const FilterSection: React.FC = () => {
-  const { filters, setFilter } = useAppStore();
+  const filters = useAppStore((s) => s.filters);
+  const setFilter = useAppStore((s) => s.setFilter);
 
   return (
     <section className="sb-card">

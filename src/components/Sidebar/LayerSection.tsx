@@ -18,7 +18,8 @@ const LAYERS: LayerDef[] = [
 ];
 
 export const LayerSection: React.FC = () => {
-  const { layers, setLayer } = useAppStore();
+  const layers = useAppStore((s) => s.layers);
+  const setLayer = useAppStore((s) => s.setLayer);
 
   return (
     <section className="sb-card">

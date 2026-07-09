@@ -48,7 +48,12 @@ const RECONNECT_MAX_MS   = 60_000;
 const RECONNECT_ATTEMPTS = 5;
 
 export function useAISStream() {
-  const { upsertVessel, pruneStaleVessels, setStatus, setLastUpdate, addAlert, alerts } = useAppStore();
+  const upsertVessel      = useAppStore((s) => s.upsertVessel);
+  const pruneStaleVessels = useAppStore((s) => s.pruneStaleVessels);
+  const setStatus         = useAppStore((s) => s.setStatus);
+  const setLastUpdate     = useAppStore((s) => s.setLastUpdate);
+  const addAlert          = useAppStore((s) => s.addAlert);
+  const alerts            = useAppStore((s) => s.alerts);
 
   const socketRef         = useRef<WebSocket | null>(null);
   const renderTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null);

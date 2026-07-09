@@ -8,7 +8,10 @@ interface Props {
 }
 
 export const VesselDetail: React.FC<Props> = ({ onTrack }) => {
-  const { selectedVessel, setSelectedVessel, setTrackedMMSI, addAlert } = useAppStore();
+  const selectedVessel = useAppStore((s) => s.selectedVessel);
+  const setSelectedVessel = useAppStore((s) => s.setSelectedVessel);
+  const setTrackedMMSI = useAppStore((s) => s.setTrackedMMSI);
+  const addAlert = useAppStore((s) => s.addAlert);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   // Move focus into the panel on open, close on Escape, restore focus on close.

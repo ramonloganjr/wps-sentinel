@@ -14,8 +14,9 @@ interface Props {
 }
 
 export const Header: React.FC<Props> = ({ onMenuToggle, sidebarOpen, installable, onInstall }) => {
-  const { status, vessels, lastUpdate } = useAppStore();
-  const vesselCount = Object.keys(vessels).length;
+  const status = useAppStore((s) => s.status);
+  const vesselCount = useAppStore((s) => Object.keys(s.vessels).length);
+  const lastUpdate = useAppStore((s) => s.lastUpdate);
   const isOffline = status === 'error' || status === 'offline';
 
   return (

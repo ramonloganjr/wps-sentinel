@@ -41,7 +41,8 @@ export const App: React.FC = () => {
   useTheme();
   useAISStream();
 
-  const { vessels, setSelectedVessel } = useAppStore();
+  const vessels = useAppStore((s) => s.vessels);
+  const setSelectedVessel = useAppStore((s) => s.setSelectedVessel);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const deferredPrompt = useRef<DeferredPrompt | null>(null);
