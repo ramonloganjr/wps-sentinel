@@ -334,13 +334,12 @@ export function useNews() {
     const fresh = await fetchOneFeed(feed);
     if (!fresh.length) return;
 
-    setItems((prev) => {
-      // Merge fresh items into existing, re-rank
-      const merged = mergeRanked([fresh, prev]);
-      setCache(merged);
-      addSeenLinks(fresh.map((i) => i.id));
-      return merged;
-    });
+    // Merge fresh items into the latest committed list and re-rank.
+    // Keep the state updater pure — persist/dedup as plain effects after.
+    const merged = mergeRanked([fresh, itemsRef.current]);
+    setItems(merged);
+    setCache(merged);
+    addSeenLinks(fresh.map((i) => i.id));
     setLastFetched(new Date());
   }, []);
 

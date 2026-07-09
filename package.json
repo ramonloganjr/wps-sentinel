@@ -4,9 +4,12 @@
   "description": "Real-time maritime domain awareness platform for the West Philippine Sea",
   "scripts": {
     "dev": "vite",
-    "start": "npx serve .",
+    "start": "npx serve dist",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.21",
