@@ -479,6 +479,42 @@ html, body {
 .stat-value { display: block; font-size: 22px; font-weight: 700; color: var(--accent); line-height: 1; }
 .stat-label { display: block; font-size: 9px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
 
+/* ── Error boundary fallback ── */
+.app-error {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg-dark);
+}
+.app-error-card {
+  max-width: 380px;
+  width: 100%;
+  border-radius: 14px;
+  padding: 28px 24px;
+  text-align: center;
+  color: var(--text);
+}
+.app-error-card svg { color: var(--warning); margin-bottom: 12px; }
+.app-error-card h1 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+.app-error-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 18px; }
+.app-error-btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--accent2);
+  background: rgba(0,102,255,0.15);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.app-error-btn:hover { background: rgba(0,102,255,0.28); }
+
 /* ── Map ── */
 .map-container {
   flex: 1;
